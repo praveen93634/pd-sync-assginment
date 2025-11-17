@@ -10,7 +10,13 @@ export const getValueByPath = (obj: any, path: string): any => {
 export const getMappedData = (inputData: any, mappings: MappingRules[]) => {
     const output: Record<string, any> = {};
     for (const rule of mappings) {
-        output[rule.pipedriveKey] = getValueByPath(inputData, rule.inputKey);
+          const value=getValueByPath(inputData, rule.inputKey);
+          //checking the edge case when getValueByPath return undefined
+          if(value==undefined){
+            console.warn(`${rule.inputKey} is not present`)
+            continue;
+          }
+        output[rule.pipedriveKey] = value;
     }
     return output;
 }
