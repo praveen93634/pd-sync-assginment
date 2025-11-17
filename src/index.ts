@@ -1,23 +1,36 @@
-import dotenv from "dotenv";
 import type { PipedrivePerson } from "./types/pipedrive";
 import inputData from "./mappings/inputData.json";
 import mappings from "./mappings/mappings.json";
-
-// Load environment variables from .env file
-dotenv.config();
-
-// Get API key and company domain from environment variables
-const apiKey = process.env.PIPEDRIVE_API_KEY;
-const companyDomain = process.env.PIPEDRIVE_COMPANY_DOMAIN;
+import { savePerson, searchPerson, updatePerson } from "./controller/person.controller";
+import { getMappedData } from "./utils/inputMapping";
 
 // Write your code here
-const syncPdPerson = async (): Promise<PipedrivePerson> => {
+const syncPdPerson = async (): Promise<PipedrivePerson | undefined> => {
   try {
-    // Write your code here
+
+    //getting the mapped data
+    const personData = getMappedData(inputData, mappings);
+
+    //check if the Input name is present 
+    if (!personData.name) {
+      console.error("Name is Missing")
+    }
+
+    const existingPerson = await searchPerson(personData.name, "name");
+
+    //if the person present already update them
+    if (existingPerson) {
+      
+      //duplicate match handled in searchPerson
+      return await updatePerson(existingPerson.id, personData);
+    }
+  
+    return await savePerson(personData);
   } catch (error) {
     // Handle error
+    console.error("syncPdPerson",error)
   }
 };
-
-const pipedrivePerson = syncPdPerson();
-console.log(pipedrivePerson);
+const pipedrivePerson = syncPdPerson().then((res:any)=>{
+  console.log(res);
+});

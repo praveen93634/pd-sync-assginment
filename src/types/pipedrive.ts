@@ -20,6 +20,11 @@ export interface PipedrivePersonOrganization {
   value: number;
 }
 
+export interface MappingRules{
+  pipedriveKey:string,
+  inputKey:string
+}
+
 export interface PipedriveContactInfo {
   label: string;
   value: string;
